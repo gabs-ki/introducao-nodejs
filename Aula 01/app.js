@@ -23,6 +23,7 @@ var entradaDados = readline.createInterface({
 //um retorno de dados automaticamente, sem precisar sair deste processamento.
 
 
+
 // Cria uma interação com o usuário, para entrada de dados.
 //Após o usuário digitar o conteúdo, o objeto entradaDados permite
 //retornar o contúdo digitado para ser utilizado. Isso acontece através
