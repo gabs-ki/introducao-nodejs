@@ -55,7 +55,7 @@ var entradaDados = readline.createInterface({
 
                         /*
                             Conversão de Tipos De Dados
-                            parseINn() ou Number.parseInt() = conveerte string em inteiro
+                            parseINn() ou Number.parseInt() = converte string em inteiro
                             parseFloat() ou Number.parseFloat() = converte string em real
 
                             Number() = Converte String para número, conforme a entrada do valor
@@ -112,12 +112,45 @@ var entradaDados = readline.createInterface({
                                 
                                 console.log('ERRO: você não digitou um número válido')
                             
-                            }
-                            else{
-                                media = (Number(valor1) + Number(valor2) + Number(valor3) + Number(valor4))/4
-                                console.log(media)
+                                //Validação para entrada de dados somente entre 0 e 10
+                            } else if (Number(valor1) < 0 || Number(valor2) < 0 || Number(valor3) < 0 || Number(valor4) < 0 ) {
                                 
+                                console.log('ERRO: Digite um numero acima de 0')
+
+                            } else if (Number(valor1) > 10 || Number(valor2) > 10 || Number(valor3) > 10 || Number(valor4) > 10 ) {
+                                
+                                console.log('ERRO: Digite um valor abaixo de 10')
                             }
+                            else {
+                                media = (Number(valor1) + Number(valor2) + Number(valor3) + Number(valor4))/4
+                                
+                                
+                                if (media >= 7.0) {
+                                    console.log('O aluno foi aprovado')
+                                } else {
+                                    console.log('O aluno foi reprovado')
+                                }
+
+                                console.log('Média do aluno: ' + media.toFixed(1))
+                            }
+
+                            /*
+                            - media.toFixed é usado para definir quantas casas decimais queremos que sejam exibidas
+                                o número 1 define que apenas uma casa seja exibida
+                            */
+
+
+                            /*
+                            Objetivos Aula 30/01 :
+
+                            -
+                            * Notas digitadas sejam entre 0 e 10
+                            * Colocar o status da média do aluno - acima de 7 aprovado - abaixo de 7 reprovado
+                            -
+
+                            */
+
+                        
                         
                         
 
