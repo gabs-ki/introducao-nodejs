@@ -134,6 +134,8 @@ var entradaDados = readline.createInterface({
                                 console.log('Média do aluno: ' + media.toFixed(1))
                             }
 
+
+                            
                             /*
                             - media.toFixed é usado para definir quantas casas decimais queremos que sejam exibidas
                                 o número 1 define que apenas uma casa seja exibida
