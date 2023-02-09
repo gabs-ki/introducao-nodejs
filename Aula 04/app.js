@@ -13,7 +13,7 @@ var matematica = require('./modulo/calculadora.js')
 //Importa da biblioteca para entrada de dados
 var readline = require('readline')
 
-
+ 
 // Cria um objeto para manipular as entradas de dados
 var entradaDados = readline.createInterface ({
     input: process.stdin,
@@ -59,10 +59,12 @@ entradaDados.question('valor: \n', function(numero1){
 
                 //Obs: toUpperCase - converte uma String em MAIUSCULO
                 // ToLowerCase - converte um String em minusculo
-               if ( resultado = matematica.calculadora(valor1, valor2, operacao)) {
-                console.log(resultado)
-               } else {
+                resultado = matematica.calculadora(valor1, valor2, operacao)
+               if ( resultado == false && typeof(resultado) == 'boolean') {
                 entradaDados.close
+               } else {
+                
+                console.log(resultado)
                }
                 
                 
