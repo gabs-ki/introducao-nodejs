@@ -22,8 +22,8 @@ const calculadoraDeMedia = function(numero1, numero2, numero3, numero4){
         return status
     } else {
         resultado = (Number(nota1) + Number(nota2) + Number(nota3) + Number(nota4)) / 4
-        
-    } return resultado
+        return resultado
+    } 
 
 
 }
