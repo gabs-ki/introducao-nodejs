@@ -13,6 +13,19 @@ const listaNomes = ['Nami', 'Luffy', 'Zoro', 'Ace', 'Sanji', 'BarbaBranca', {nom
 
 const listaProdutos = ['Teclado', 'Mouse', 'Monitor', 'Gabinete', 'HD', 'Memória']
 
+/*******
+ * JSON é composto por chabe (atributo) e valor
+ *  
+ * {    /Chave/  |  /Valor/
+ *               |
+ *      nome:    | 'José',
+ *      celular: | '11945426819',
+ *      email:   | 'jose@gmail.com'
+ * }
+ ******/
+
+
+
 const exibindoDados = function () {
    
 
@@ -169,4 +182,8 @@ const desafio = function (nomeProduto, novaArray) {
 // console.table(listaProdutos)
 //manipulandoDados()
 
-desafio('Teclado', listaProdutos)
+// desafio('Teclado', listaProdutos)
+
+const listagemProdutos = function() {
+    listProdutosJSON = {produtos : listaProdutos}
+}
