@@ -2,9 +2,11 @@
 
 var listaCidade = require('../estados_cidades.js')
 
+let listaEstadosBrasil = listaCidade.estadosCidades.estados
+
 const getListaDeEstados = function () {
 
-    let status = true
+    let status
     let estadosJson = {}
     let estadosArray = []
 
@@ -16,9 +18,11 @@ const getListaDeEstados = function () {
     })
 
     if (status) {
-        return estadosJson
+        status = estadosJson
+        return status
     } else {
-        return false
+        status = false
+        return status
     }
 
 }
@@ -29,7 +33,7 @@ const getDadosEstado = function (uf) {
 
     listaCidade.estadosCidades.estados.forEach(function (descricaoEstado) {
 
-        if (ufEstado == descricaoEstado.sigla) {
+        if (ufEstado == descricaoEstado.sigla && ufEstado != undefined && ufEstado != null) {
 
 
             estadoJson.uf = descricaoEstado.sigla
@@ -47,21 +51,26 @@ const getDadosEstado = function (uf) {
 const getCapitalEstado = function (uf) {
     let ufEstado = uf.toUpperCase()
     let capitaisJson = {}
+    let status
 
     listaCidade.estadosCidades.estados.forEach(function (descricaoEstado) {
 
-        if (ufEstado == descricaoEstado.sigla) {
+        if (ufEstado == descricaoEstado.sigla && ufEstado != undefined && ufEstado != null) {
 
 
             capitaisJson.uf = descricaoEstado.sigla
             capitaisJson.descricao = descricaoEstado.nome
             capitaisJson.capital = descricaoEstado.capital
-
-
-        } else {
-            return false
-        }
+        } 
     })
+
+    if (status) {
+        status = capitaisJson
+        return status
+    } else {
+        status = false
+        return status
+    }
 }
 
 const getEstadosRegiao = function (regiao) {
@@ -69,6 +78,7 @@ const getEstadosRegiao = function (regiao) {
     let estadosJson = {}
     let ufJson = {}
     let estadosArray = []
+    let status
 
     listaCidade.estadosCidades.estados.forEach(function (descricaoRegiao) {
 
@@ -84,15 +94,15 @@ const getEstadosRegiao = function (regiao) {
             estadosJson = {
                 regiao: descricaoRegiao.regiao,
                 estados: estadosArray
-            }
-
-
-        } else {
-
-            return false
-        }
-
+            }  
+        } 
     })
+    if (estadosJson == undefined) {
+        status = false
+    } else {
+        status = estadosJson
+    }
+    return status
 
 }
 
@@ -100,20 +110,64 @@ const getCapitalPais = function () {
     let capitalJson = {}
     let capitaisArray = []
     let listaJson = {}
+    let status
 
-    listaCidade.estadosCidades.estados.forEach(function (capitalLista) {
+    listaEstadosBrasil.forEach(function (capitalLista) {
 
+        if (capitalLista.capital_pais != undefined) {
             capitalJson = {
-                
+                capital_atual: capitalLista.capital_pais.capital,
                 uf: capitalLista.sigla,
                 descricao: capitalLista.nome,
                 capital: capitalLista.capital,
                 regiao: capitalLista.regiao,
-                capital_pais_ano_inicio: capitalLista.capital_pais,
-                capital_pais_ano_termino: capitalLista.capital_pais
+                capital_pais_ano_inicio: capitalLista.capital_pais.ano_inicio,
+                capital_pais_ano_termino: capitalLista.capital_pais.ano_fim
             }
+            capitaisArray.push(capitalJson)
+            listaJson = {
+                capitais: capitaisArray
+            }
+        }
+
     })
-    console.log(capitalJson)
+    if (capitaisArray == undefined) {
+        status = false
+    } else {
+        status = listaJson
+    }
+    return status
 }
 
-getCapitalPais()
+const getCidades = function (sigla) {
+    let siglaEstados = sigla.toUpperCase()
+    let descricaoCidade = {}
+    let listaCidades = []
+
+
+    if (siglaEstados != undefined && siglaEstados != listaEstadosBrasil.sigla) {
+
+        listaEstadosBrasil.forEach(function (estadosBrasil) {
+
+            if (estadosBrasil.sigla == siglaEstados) {
+                estadosBrasil.cidades.forEach(function (cidadesBrasil) {
+                    listaCidades.push(cidadesBrasil.nome)
+                })
+
+                descricaoCidade = {
+                    uf: estadosBrasil.sigla,
+                    descricao: estadosBrasil.nome,
+                    quantidade_cidades: estadosBrasil.cidades.length,
+                    cidades: listaCidades
+                }
+
+            }
+        })
+        return descricaoCidade
+    } else {
+        
+        return false
+    }
+    
+}
+
