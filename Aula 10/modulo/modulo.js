@@ -31,12 +31,11 @@ const getListaDeEstados = function () {
 const getDadosEstado = function (uf) {
     let ufEstado = uf.toUpperCase()
     let estadoJson = {}
+    let status = true
 
-    listaCidade.estadosCidades.estados.forEach(function (descricaoEstado) {
+    listaEstadosBrasil.forEach(function (descricaoEstado) {
 
-        if (ufEstado == descricaoEstado.sigla && ufEstado != undefined && ufEstado != null) {
-
-
+        if (ufEstado == descricaoEstado.sigla.toUpperCase()) {
             estadoJson.uf = descricaoEstado.sigla
             estadoJson.descricao = descricaoEstado.nome
             estadoJson.capital = descricaoEstado.capital
@@ -45,29 +44,38 @@ const getDadosEstado = function (uf) {
         } else {
             return false
         }
-    })
-}
 
+    })
+
+    if (status) {
+        return estadoJson
+    } else {
+        status = false
+        return status
+    }
+}
 
 const getCapitalEstado = function (uf) {
     let ufEstado = uf.toUpperCase()
     let capitaisJson = {}
-    let status
+    let status = true
 
     listaCidade.estadosCidades.estados.forEach(function (descricaoEstado) {
 
-        if (ufEstado == descricaoEstado.sigla && ufEstado != undefined && ufEstado != null) {
+        if (ufEstado == descricaoEstado.sigla.toUpperCase()) {
 
 
             capitaisJson.uf = descricaoEstado.sigla
             capitaisJson.descricao = descricaoEstado.nome
             capitaisJson.capital = descricaoEstado.capital
-        } 
+        } else {
+            return false
+        }
     })
 
     if (status) {
-        status = capitaisJson
-        return status
+        
+        return capitaisJson
     } else {
         status = false
         return status
@@ -144,13 +152,14 @@ const getCidades = function (sigla) {
     let siglaEstados = sigla.toUpperCase()
     let descricaoCidade = {}
     let listaCidades = []
+    let status = true
 
 
     if (siglaEstados != undefined && siglaEstados != listaEstadosBrasil.sigla) {
 
         listaEstadosBrasil.forEach(function (estadosBrasil) {
 
-            if (estadosBrasil.sigla == siglaEstados) {
+            if (estadosBrasil.sigla.toUpperCase() == siglaEstados) {
                 estadosBrasil.cidades.forEach(function (cidadesBrasil) {
                     listaCidades.push(cidadesBrasil.nome)
                 })
@@ -165,11 +174,13 @@ const getCidades = function (sigla) {
             }
         })
         return descricaoCidade
+    } 
+    if (status) {
+        return descricaoCidade
     } else {
-        
-        return false
+        status = false
+        return status
     }
-    
 }
 
 module.exports = {
