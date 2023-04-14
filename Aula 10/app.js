@@ -63,7 +63,7 @@ app.use((request, response, next) => {
 //obs: se não usar o asyn, a requisição é perdida pois o front acha que a API está do ar
 
 //Endpoint para listar todos os estados
-app.get('/estados', cors(), async function (request, response, next) {
+app.get('/v1/senai/estados', cors(), async function (request, response, next) {
 
 
 
@@ -82,7 +82,9 @@ app.get('/estados', cors(), async function (request, response, next) {
 })
 
 //EndPoint: Listar os dados do estado filtrando pela sigla do estado
-app.get('/estado/:uf', cors(), async function (request, response, next) {
+// Sempre colocar nome(/sigla/) no filtro(/:uf/ - /:uf-estado/) que eu vou fazer
+
+app.get('/v1/senai/estado/sigla/:uf', cors(), async function (request, response, next) {
 
     let statusCode
     let dadosEstado = {}
@@ -114,7 +116,41 @@ app.get('/estado/:uf', cors(), async function (request, response, next) {
     response.json(dadosEstado)
 })
 
-app.get('/estado/capital/:uf', cors(), async function (request, response, next) {
+//EndPoint: podemos versionar os nossos endpoints para nos devolver dados adicionais ou diferentes,
+//  como dar acesso restrito a usuários que pagam a api
+app.get('/v2/senai/estado/sigla/:uf', cors(), async function (request, response, next) {
+
+    let statusCode
+    let dadosEstado = {}
+
+    //Recebe a sigla do estado que será enviada pela URL da requisição
+    let siglaEstado = request.params.uf
+
+    //Tratamento para validação de entrada de dados incorreta
+    if (siglaEstado.length != 2 || !isNaN(siglaEstado) || siglaEstado == undefined || siglaEstado == '') {
+
+        statusCode = 400
+
+        dadosEstado.message = 'Não foi possível acessar os dados de entrada (uf) que foi enviado, pois não corresponde ao exigido, confira o valor,  pois não pode ser vazio, precisa ser caracteres e ter duas letras'
+
+    } else {
+        //Chama a função para retornar os dados do contato
+        let estado = estadosCidades.getDadosEstado(siglaEstado)
+
+        if (estado) {
+            statusCode = 200
+            dadosEstado = estado
+        } else {
+            statusCode = 404
+        }
+    }
+
+    //Retorna o codigo e o JSON
+    response.status(statusCode)
+    response.json(dadosEstado)
+})
+
+app.get('/v1/senai/estado/capital/:uf', cors(), async function (request, response, next) {
 
     let statusCode
     let dadosEstado = {}
@@ -141,7 +177,7 @@ app.get('/estado/capital/:uf', cors(), async function (request, response, next) 
     response.json(dadosEstado)
 })
 
-app.get('/estado/regiao/:regiao', cors(), async function (request, response, next) {
+app.get('/v1/senai/estado/regiao/:regiao', cors(), async function (request, response, next) {
     let statusCode
     let dadosRegiao = {}
 
@@ -167,7 +203,7 @@ app.get('/estado/regiao/:regiao', cors(), async function (request, response, nex
     response.json(dadosRegiao)
 })
 
-app.get('/pais/capital/', cors(), async function (request, response, next) {
+app.get('/v1/senai/pais/capital/', cors(), async function (request, response, next) {
 
 
     let statusCode
@@ -188,7 +224,12 @@ app.get('/pais/capital/', cors(), async function (request, response, next) {
     response.json(dadosCapital)
 })
 
-app.get('/estado/cidades/:uf', cors(), async function(request, response, next){
+// Filtro
+//  Organização da nomenclatura do end-point
+//  (/cidades/estado/sigla/:uf)
+//  É correto sempre manter o nome do projeto ou o nome da empresa no 
+//  inicio do filtro/url
+app.get('/v1/senai/estado/cidades/:uf', cors(), async function(request, response, next){
 
     let statusCode
     let dadosCidades = {}
@@ -211,6 +252,61 @@ app.get('/estado/cidades/:uf', cors(), async function(request, response, next){
             statusCode = 404
         }
     }
+    response.status(statusCode)
+    response.json(dadosCidades)
+
+})
+
+// A partir de agora, vamos filtrar de forma diferente, para não deixar a url muito grande
+//QUERY STRING - pesquisar
+//Variáveis na url = '?' é um caractere curinga, tudo o que tem antes dele é a url do site,
+//  o que vem após dele é a váriavel
+// & comercial para concatenar
+// (http://localhost:8080/v2/senai/cidades?uf=SP)
+// é uma particularidade do protocolo HTTP
+app.get('/v2/senai/cidades', cors(), async function(request, response, next){
+
+    let statusCode
+    let dadosCidades = {}
+
+
+    /**
+     * Existem 2 opções para receber variaveis para filtro:
+     * params - permite receber variaveis na estrutura da utl criada no endPoint (enviar o id/Pk via params)
+     *  utilizado para id(PK)
+     * query ou queryString - permite receber uma ou muitas variaveis para realizar filtros avançados(enviar outros tipos de dados)
+     */
+
+
+    // Para receber variáveos cruas da url você utiliza o params
+    let siglaCidade = request.params.uf
+
+    //Recebe uma variavel encaminhada via QueryString
+    // Para receber variáveos query da url você utiliza o query
+    let siglaEstado = request.query.uf
+    //let cepEstado = request.query.cep
+    //let populacaoEstado = request.query.populacao
+
+    //Tratamento para validação de entrada de dados incorreta
+    if (siglaEstado.length != 2 || !isNaN(siglaEstado) || siglaEstado == undefined || siglaEstado == '') {
+
+        statusCode = 400
+
+        dadosCidades.message = 'Não foi possível acessar os dados de entrada (uf) que foi enviado, pois não corresponde ao exigido, confira o valor,  pois não pode ser vazio, precisa ser caracteres e ter duas letras'
+
+    } else {
+        //Chama a função para retornar os dados do contato
+        let cidades = estadosCidades.getCidades(siglaEstado)
+
+        if (cidades) {
+            statusCode = 200
+            dadosCidades = cidades
+        } else {
+            statusCode = 404
+        }
+    }
+
+    //Retorna o codigo e o JSON
     response.status(statusCode)
     response.json(dadosCidades)
 
