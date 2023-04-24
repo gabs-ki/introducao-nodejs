@@ -38,31 +38,77 @@ app.use((request, response, next) => {
 * Versão: 1.0
 ************************************************************************************/
 
+    //Depois de instalar o Express e os arquivos da API,
+    // precisamos instalar o PRISMA(Biblioteca para estabelecer a 
+    //  conexão do banco, depois instalar o PRISMA CLIENT)
+
+    /*********************************- PRISMA -**********************************
+     *                              
+     * Prisma é uma bibliote para conexão com o banco de dados
+     * PRISMA - npm install prisma --save
+     * 
+     * npx prisma - checa se está instalado
+     * 
+     * npx prisma init - para iniciar o prisma e criar os arquivos necessários
+     * 
+     * npm install @prisma/client --save = para instalar o client do prisma
+     * 
+     * npx prisma migrate dev #### Serve para realizar o sincronismo entre o prisma e o BD
+    ***************************************************************************/
+   
+     //Import do arquivo da controller que irá solicitar os dados do Banco de dados
+     var controllerAluno = require('./controller/controller_aluno.js')
+
     //Obrigatório ter esses 2 Endpoints em todo projeto
 
     //EndPoint: Retorna todos os dados de alunos
-    app.get('/v1/lion-school/aluno', cors(), async, function(request, response) {
+    app.get('/v1/lion-school/aluno', cors(), async function(request, response) {
+        
+        //Recebe os dados da controller do aluno
+        let dadosAluno = await controllerAluno.getAlunos()
+
+        //Valida se existe registros de alunos
+        if (dadosAluno){
+            response.json(dadosAluno)
+            response.status(200)
+        } else {
+            response.json()
+            response.status(404)
+        }
 
     })
 
-
     //EndPoint: Retorna o aluno filtrando pelo ID
-    app.get('/v1/lion-school/aluno/:id', cors(), async, function(request, response) {
+    app.get('/v1/lion-school/aluno/:id', cors(), async function(request, response) {
+    
+        let idAluno = request.params.id
 
+        let dadosAlunoId = await controllerAluno.getBuscarAlunoID(idAluno)
+       
+
+        if (dadosAlunoId == false) {
+           response.status(404)
+           response.json()
+        } else {
+            response.json(dadosAlunoId)
+            response.status(200)
+        }
+
+        
     })
 
     //EndPoint: Insere um dado novo
-    app.post('/v1/lion-school/aluno', cors(), async, function(request, response) {
+    app.post('/v1/lion-school/aluno', cors(), async function(request, response) {
 
     })
 
     //EndPoint: Atualiza um aluno existente, filtrando pelo ID
-    app.put('/v1/lion-school/aluno/:id', cors(), async, function(request, response) {
+    app.put('/v1/lion-school/aluno/:id', cors(), async function(request, response) {
 
     })
 
     //EndPoint: Exclui um aluno existente, filtrando pelo ID
-    app.delete('/v1/lion-school/aluno/:id', cors(), async, function(request, response) {
+    app.delete('/v1/lion-school/aluno/:id', cors(), async function(request, response) {
 
     })
 
