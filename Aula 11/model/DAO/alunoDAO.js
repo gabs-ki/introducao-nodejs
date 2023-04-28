@@ -5,11 +5,39 @@
  * Versão: 1.0
 ************************************************************************************/
 
- //Import da biblioteca do prisma client
- var {PrismaClient} = require('@prisma/client')
+//Import da biblioteca do prisma client
+var {PrismaClient} = require('@prisma/client')
+
+//Instância da classe PrismaClient
+var prisma = new PrismaClient()
 
 //Inserir dados do aluno no Banco de Dados
-const insertAluno = (dadosDoAluno) => {
+const insertAluno = async (dadosDoAluno) => {
+
+    //ScriptSQL para inserir dados
+    let sql = `insert into tbl_aluno (
+        nome,
+        rg,
+        cpf,
+        data_nascimento,
+        email
+        ) values (
+        '${dadosDoAluno.nome}',
+        '${dadosDoAluno.rg}',
+        '${dadosDoAluno.cpf}',
+        '${dadosDoAluno.data_nascimento}',
+        '${dadosDoAluno.email}'
+        )`
+
+
+
+    //Executa o scriptSQL no B
+    let resultStatus = await prisma.$executeRawUnsafe(sql)
+
+    if(resultStatus)
+        return true
+    else
+        return false
     
 }
 
@@ -26,8 +54,6 @@ const deleteAluno = (id) => {
 //Retornar todos os aluno do Banco de Dados
 const selectAllAlunos = async () => { 
     
-    //Instância da classe PrismaClient
-    let prisma = new PrismaClient()
 
     //ScripSQL para buscar todos os itens no banco de dados
     let sql = 'select * from tbl_aluno'
@@ -47,6 +73,23 @@ const selectAllAlunos = async () => {
 
 }
 
+//Retornar o aluno filtrando pelo Nome
+const selectByNameAluno = async (name) => {
+
+    let nameAluno = name
+    
+    let prisma = new PrismaClient()
+
+    let sql = `select * from tbl_aluno where nome like '%${nameAluno}%'`
+
+    let rsAluno = await prisma.$queryRawUnsafe(sql)
+
+    if(rsAluno.length > 0) {
+        return rsAluno
+    } else {
+        return false
+    }
+}
 //Retornar o aluno filtrando pelo ID
 const selectByIdAluno = async (id) => {
 
@@ -67,5 +110,7 @@ const selectByIdAluno = async (id) => {
 
 module.exports = {
     selectAllAlunos,
-    selectByIdAluno
+    selectByIdAluno,
+    insertAluno,
+    selectByNameAluno
 }

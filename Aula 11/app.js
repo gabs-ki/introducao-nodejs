@@ -55,26 +55,53 @@ app.use((request, response, next) => {
      * 
      * npx prisma migrate dev #### Serve para realizar o sincronismo entre o prisma e o BD
     ***************************************************************************/
-   
-     //Import do arquivo da controller que irá solicitar os dados do Banco de dados
-     var controllerAluno = require('./controller/controller_aluno.js')
+
+    //Define que os dados que irão chegar para o Body da requisição será no padrão JSON
+    const bodyParserJson = bodyParser.json()
+
+    //Recebe os dados da controller do aluno
+    let dadosAluno = controllerAluno
+
+    //Import do arquivo da controller que irá solicitar os dados do Banco de dados
+    var controllerAluno = require('./controller/controller_aluno.js')
 
     //Obrigatório ter esses 2 Endpoints em todo projeto
 
     //EndPoint: Retorna todos os dados de alunos
     app.get('/v1/lion-school/aluno', cors(), async function(request, response) {
-        
-        //Recebe os dados da controller do aluno
-        let dadosAluno = await controllerAluno.getAlunos()
 
-        //Valida se existe registros de alunos
-        if (dadosAluno){
-            response.json(dadosAluno)
-            response.status(200)
+        let nomeAluno = request.query.nome
+        console.log(nomeAluno)
+        
+        let dadosAluno = await controllerAluno.getAlunos()
+        
+        
+        if(nomeAluno == '' || nomeAluno == undefined){
+            if (dadosAluno){
+                
+                response.json(dadosAluno)
+                response.status(200)
+            } else {
+                
+                response.status(404)
+                response.json()
+            }
         } else {
-            response.json()
-            response.status(404)
+            let dadosAlunoNome = await controllerAluno.getBuscarAlunoNome(nomeAluno)
+
+            if(dadosAlunoNome){
+                
+                response.json(dadosAlunoNome)
+                response.status(200)
+            } else {
+                
+                response.status(404)
+                response.json()
+            }
         }
+    
+        //Valida se existe registros de alunos
+        
 
     })
 
@@ -82,6 +109,7 @@ app.use((request, response, next) => {
     app.get('/v1/lion-school/aluno/:id', cors(), async function(request, response) {
     
         let idAluno = request.params.id
+        
 
         let dadosAlunoId = await controllerAluno.getBuscarAlunoID(idAluno)
        
@@ -98,7 +126,18 @@ app.use((request, response, next) => {
     })
 
     //EndPoint: Insere um dado novo
-    app.post('/v1/lion-school/aluno', cors(), async function(request, response) {
+    app.post('/v1/lion-school/aluno', cors(), bodyParserJson, async function(request, response) {
+
+        //Recebe os dados encaminhados na requisição
+        let dadosBody = request.body
+        
+
+        let resultDadosAluno = await controllerAluno.inserirNovoAluno(dadosBody)
+        
+
+        response.status(resultDadosAluno.status)
+        response.json(resultDadosAluno)
+
 
     })
 
