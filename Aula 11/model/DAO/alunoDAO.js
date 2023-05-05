@@ -42,13 +42,37 @@ const insertAluno = async (dadosDoAluno) => {
 }
 
 //Atualizar dados do aluno no Banco de Dados
-const updateAluno = (dadosDoAluno) => {
-    
+const updateAluno = async (dadosDoAluno) => {
+
+    //ScriptSQL para atualizar os dados no BD
+    let sql = ` update tbl_aluno set
+                    nome = '${dadosDoAluno.nome}',
+                    rg = '${dadosDoAluno.rg}',
+                    cpf = '${dadosDoAluno.cpf}',
+                    data_nascimento = '${dadosDoAluno.data_nascimento}',
+                    email = '${dadosDoAluno.email}'
+                where id = ${dadosDoAluno.id}
+              `
+    //Executa o script no BD
+    let resultStatus = await prisma.$executeRawUnsafe(sql)
+
+    if(resultStatus)
+        return true
+    else
+        return false
 }
 
 //Deletar dados do aluno no Banco de Dados
-const deleteAluno = (id) => {
-    
+const deleteAluno = async (id) => {
+
+    let sql = ` delete from tbl_aluno where id = ${id}`
+
+    let resultStatus = await prisma.$executeRawUnsafe(sql)
+
+    if(resultStatus)
+        return true
+    else
+        return false
 }
 
 //Retornar todos os aluno do Banco de Dados
@@ -112,5 +136,7 @@ module.exports = {
     selectAllAlunos,
     selectByIdAluno,
     insertAluno,
-    selectByNameAluno
+    selectByNameAluno,
+    updateAluno,
+    deleteAluno
 }

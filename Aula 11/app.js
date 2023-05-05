@@ -61,6 +61,7 @@ app.use((request, response, next) => {
 
     //Recebe os dados da controller do aluno
     let dadosAluno = controllerAluno
+    var message = require('./controller/modulo/config.js')
 
     //Import do arquivo da controller que irá solicitar os dados do Banco de dados
     var controllerAluno = require('./controller/controller_aluno.js')
@@ -71,7 +72,7 @@ app.use((request, response, next) => {
     app.get('/v1/lion-school/aluno', cors(), async function(request, response) {
 
         let nomeAluno = request.query.nome
-        console.log(nomeAluno)
+       
         
         let dadosAluno = await controllerAluno.getAlunos()
         
@@ -131,10 +132,8 @@ app.use((request, response, next) => {
         //Recebe os dados encaminhados na requisição
         let dadosBody = request.body
         
-
         let resultDadosAluno = await controllerAluno.inserirNovoAluno(dadosBody)
         
-
         response.status(resultDadosAluno.status)
         response.json(resultDadosAluno)
 
@@ -142,12 +141,63 @@ app.use((request, response, next) => {
     })
 
     //EndPoint: Atualiza um aluno existente, filtrando pelo ID
-    app.put('/v1/lion-school/aluno/:id', cors(), async function(request, response) {
+    app.put('/v1/lion-school/aluno/:id', cors(), bodyParserJson, async function(request, response) {
+            
+
+        let contentType = request.headers['content-type']
+
+        //Validação para receber dados apenas no formato JSON
+        if(String(contentType).toLowerCase() == 'application/json'){
+            //Recebe o ID do aluno pelo <Parâmetro>
+            let idAluno = request.params.id
+            
+            //Recebe os dados do aluno encaminhado no corpo da requisição
+            let dadosBody = request.body
+
+            //Encaminha os dados para a controller
+            let resultDadosAluno = await controllerAluno.updateAluno(dadosBody, idAluno)
+
+            //
+            response.status(resultDadosAluno.status)
+            response.json(resultDadosAluno)
+        } else {
+
+            response.status(message.ERROR_INVALID_CONTENT_TYPE.status)
+            response.json(message.ERROR_INVALID_CONTENT_TYPE)
+        }
+
 
     })
 
     //EndPoint: Exclui um aluno existente, filtrando pelo ID
     app.delete('/v1/lion-school/aluno/:id', cors(), async function(request, response) {
+
+        let idAluno = request.params.id
+
+        let dadosAlunoSelectId = await controllerAluno.getBuscarAlunoID(idAluno)
+        
+        
+        if(dadosAlunoSelectId.status == 404) {
+
+            response.status(message.ERROR_ID_NOT_FOUND.status)
+            response.json(message.ERROR_ID_NOT_FOUND)
+
+        } else {
+            
+
+            let dadosAlunoId = await controllerAluno.deletarAluno(idAluno)
+
+            
+            if (dadosAlunoId == false) {
+                response.status(dadosAlunoId.status)
+                response.json(dadosAlunoId)
+            } else {
+                response.status(dadosAlunoId.status)
+                response.json(dadosAlunoId)
+            }
+        }
+
+        
 
     })
 

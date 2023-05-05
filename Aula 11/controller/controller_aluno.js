@@ -40,13 +40,57 @@ const inserirNovoAluno = async (dadosDoAluno) => {
 }
 
 //Update an existing student 
-const atualizarAluno = (dadosDoAluno) => {
+const updateAluno = async (dadosDoAluno, idAluno) => {
 
+    //Validação para tratar os campos obrigatórios e quantidade de de caracteres
+    if(dadosDoAluno.nome == ''              || dadosDoAluno.nome == undefined               || dadosDoAluno.nome.length > 100               ||
+       dadosDoAluno.rg == ''                || dadosDoAluno.rg == undefined                 || dadosDoAluno.rg.length > 15                  ||
+       dadosDoAluno.cpf == ''               || dadosDoAluno.cpf == undefined                || dadosDoAluno.cpf.length > 18                 ||
+       dadosDoAluno.data_nascimento == ''   || dadosDoAluno.data_nascimento == undefined    || dadosDoAluno.data_nascimento.length > 10     ||
+       dadosDoAluno.email == ''             || dadosDoAluno.email == undefined              || dadosDoAluno.email.length > 200
+    ){
+        
+        return message.ERROR_REQUIRED_FIELDS //Status code 400
+
+    //Validação de ID incorreto ou não informado
+    } else if (idAluno == '' || idAluno == undefined || isNaN(idAluno) ) {
+
+        return message.ERROR_INVALID_ID
+
+    } else {
+        //Adiciona o ID do aluno no JSON dos dados
+        dadosDoAluno.id = idAluno
+
+        //Encaminha os dados para a model do aluno
+        let resultDadosAluno = await alunoDAO.updateAluno(dadosDoAluno)
+
+        if (resultDadosAluno) {
+            return message.SUCCESS_UPDATED_ITEM // 200
+        } else {
+            return message.ERROR_INTERNAL_SERVER //Status code 500
+        }
+
+    }
 }
 
 //Delete a student
-const deletarAluno = (id) => {
+const deletarAluno = async (id) => {
+    let idAluno = id
 
+    if(idAluno == '' || idAluno == undefined || isNaN(idAluno)) {
+
+        return message.ERROR_INVALID_ID
+
+    } else {
+        let dadosAlunoId = await alunoDAO.deleteAluno(idAluno)
+
+        if (idAluno.length != 0 && dadosAlunoId) {
+            return message.SUCCESS_DELETED_ITEM
+        } else {
+            return message.ERROR_INTERNAL_SERVER
+        }
+
+    }
 }
 
 //Return a list of all students
@@ -97,19 +141,16 @@ const getBuscarAlunoID = async (id) => {
 
     let idAluno = id
     
-    let dadosAlunosJSON = {}
 
-    if (isNaN(idAluno)) {
-        return false
+    if (idAluno == '' || idAluno == undefined || isNaN(idAluno)) {
+        return message.ERROR_INVALID_ID
     } else {
         let dadosAlunoId = await alunoDAO.selectByIdAluno(idAluno)
 
         if (idAluno.length != 0 && dadosAlunoId) {
-            dadosAlunosJSON.quantidade = dadosAlunoId.length
-            dadosAlunosJSON.alunos = dadosAlunoId
-            return dadosAlunosJSON
+            return dadosAlunoId
         } else 
-            return false
+            return message.ERROR_ID_NOT_FOUND
     }
     
 }
@@ -118,5 +159,7 @@ module.exports = {
     getAlunos,
     getBuscarAlunoID,
     inserirNovoAluno,
-    getBuscarAlunoNome
+    getBuscarAlunoNome,
+    updateAluno,
+    deletarAluno
 }
